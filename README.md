@@ -1,4 +1,4 @@
-![Screen Flow Demo](https://github.com/mwolfson/ossy/blob/master/art/appdemo1.gif)
+![Screen Flow Demo](https://github.com/mwolfson/Ossy/blob/master/art/appdemo1.gif)
 
 OSSy - Easy, Beautiful Material Open Source Attribution
 =======================================================
