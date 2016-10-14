@@ -74,3 +74,5 @@
 .idea/workspace.xml
 
 *.iml
+
+build/intermediates/dex-cache/cache.xml
