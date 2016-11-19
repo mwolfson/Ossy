@@ -6,11 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.ableandroid.ossy.lib.OssAttribActivity">
+    tools:context="com.ableandroid.ossylib.OssAttribActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="184dp"
+        android:layout_height="156dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <android.support.design.widget.CollapsingToolbarLayout
@@ -29,12 +29,12 @@
                 android:orientation="horizontal"
                 android:layout_marginRight="32dp"
                 android:layout_marginLeft="32dp"
-                android:weightSum="2">
+                android:weightSum="3">
 
                 <ImageView
                     android:id="@+id/launcher"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"/>
 
@@ -44,7 +44,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="We couldn't do it without these great libraries."
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     app:layout_collapseMode="none" />
             </LinearLayout>
 

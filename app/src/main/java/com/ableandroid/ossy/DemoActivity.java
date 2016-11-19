@@ -49,7 +49,7 @@ public class DemoActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(getApplicationContext(), OssAttribActivity.class);
 //                intent.putExtra(OssAttribActivity.XTRA_APPNAME, "MikesCoolApp");
-                intent.putExtra(OssAttribActivity.XTRA_TOOLBAR, "MikesToolbarTitle");
+//                intent.putExtra(OssAttribActivity.XTRA_TOOLBAR, "MikesToolbarTitle");
 //                intent.putExtra(OssAttribActivity.XTRA_TEXT, "I am the coolest, and that is the truth");
                 startActivity(intent);
             }

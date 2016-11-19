@@ -5,11 +5,11 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.res.Resources;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
@@ -33,18 +33,23 @@ public class OssAttribActivity extends AppCompatActivity {
     public static final String XTRA_TEXT = "textExtra";
     public static final String XTRA_TOOLBAR = "toolbarTitleExtra";
 
+    private Context cxt;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_os_attrib);
 
+        cxt = getApplicationContext();
+
         Intent intent = getIntent();
+
 
         String appName = "We";
         String extraAppName = intent.getStringExtra(XTRA_APPNAME);
         if (extraAppName == null) {
             try {
-                appName = getApplicationName(getApplicationContext());
+                appName = getApplicationName(cxt);
             } catch (Exception e) {
                 appName = "We";
             }
@@ -99,7 +104,7 @@ public class OssAttribActivity extends AppCompatActivity {
 
         //Set Icon Here
         ImageView iv = (ImageView) findViewById(R.id.launcher);
-        iv.setBackground(getFullResDefaultActivityIcon());
+        iv.setImageDrawable(getFullResIcon());
     }
 
     private static final String APACHE_LISC = "Apache 2.0";
@@ -136,32 +141,25 @@ public class OssAttribActivity extends AppCompatActivity {
         return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString(stringId);
     }
 
-    private Drawable getLauncherIcon(Context context) {
-        Drawable launcherIcon = null;
+    public Drawable getFullResIcon() {
+        ActivityManager mActivityManager =(ActivityManager)this.getSystemService(Context.ACTIVITY_SERVICE);
 
-        List<PackageInfo> pack = context.getPackageManager().getInstalledPackages(0);
-
-        for(PackageInfo p : pack){
-            launcherIcon = p.applicationInfo.loadIcon(getPackageManager());
+        String mPackageName = "";
+        if(Build.VERSION.SDK_INT > 20){
+            mPackageName = mActivityManager.getRunningAppProcesses().get(0).processName;
         }
-        return launcherIcon;
-    }
+        else{
+            mPackageName = mActivityManager.getRunningTasks(1).get(0).topActivity.getPackageName();
+        }
 
-    public Drawable getFullResDefaultActivityIcon() {
-        return getFullResIcon(Resources.getSystem(), android.R.mipmap.sym_def_app_icon);
-    }
-
-    public Drawable getFullResIcon(Resources resources, int iconId) {
-        Drawable d;
+        Drawable icon = null;
         try {
-            ActivityManager activityManager = (ActivityManager) getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
-            int iconDpi = activityManager.getLauncherLargeIconDensity();
-            d = resources.getDrawableForDensity(iconId, iconDpi);
-        } catch (Resources.NotFoundException e) {
-            d = null;
+           icon  = cxt.getPackageManager().getApplicationIcon(mPackageName);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
         }
 
-        return (d != null) ? d : getFullResDefaultActivityIcon();
+        return icon;
     }
 
     private static class OssItemAdapter
