@@ -76,3 +76,5 @@
 *.iml
 
 build/intermediates/dex-cache/cache.xml
+
+.idea/vcs.xml

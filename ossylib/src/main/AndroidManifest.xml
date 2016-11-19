@@ -1,0 +1,13 @@
+<manifest package="com.ableandroid.ossylib"
+          xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name">
+        <activity
+            android:name="com.ableandroid.ossylib.OssAttribActivity"
+            android:label="Open Source">
+        </activity>
+    </application>
+
+</manifest>

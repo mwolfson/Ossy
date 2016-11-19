@@ -1,12 +1,18 @@
-package com.ableandroid.ossy.lib;
+package com.ableandroid.ossylib;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.res.Resources;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,21 +21,50 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.ableandroid.ossy.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class OssAttribActivity extends AppCompatActivity {
+    public static final String XTRA_APPNAME = "appNameExtra";
+    public static final String XTRA_TEXT = "textExtra";
+    public static final String XTRA_TOOLBAR = "toolbarTitleExtra";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_os_attrib);
 
-        setupToolbar();
+        Intent intent = getIntent();
+
+        String appName = "We";
+        String extraAppName = intent.getStringExtra(XTRA_APPNAME);
+        if (extraAppName == null) {
+            try {
+                appName = getApplicationName(getApplicationContext());
+            } catch (Exception e) {
+                appName = "We";
+            }
+        } else {
+            appName = extraAppName;
+        }
+
+        String appTitle = "Open Source";  // default
+        String extraToolbar = intent.getStringExtra(XTRA_TOOLBAR);
+        if (extraToolbar != null) {
+            appTitle = extraToolbar;
+        }
+
+        String appText = appName + " wouldn't be the same without these great libraries, which we \u2764";
+        String extraText = intent.getStringExtra(XTRA_TEXT);
+        if (extraText != null) {
+            appText = extraText;
+        }
+
+        setupToolbar(appTitle, appText);
 
         RecyclerView rv = (RecyclerView) findViewById(R.id.recyclerview);
         rv.setLayoutManager(new LinearLayoutManager(this));rv.setAdapter(new OssItemAdapter(this, this, getOssList()));
@@ -45,7 +80,7 @@ public class OssAttribActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void setupToolbar() {
+    private void setupToolbar(String appTitle, String appText) {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -55,13 +90,16 @@ public class OssAttribActivity extends AppCompatActivity {
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         //Set Toolbar title here
-        collapsingToolbar.setTitle("Open Source");
 
+        collapsingToolbar.setTitle(appTitle);
+
+        //Set AppName here
         TextView thanksTxt = (TextView) findViewById(R.id.thanks_text);
-        //Set Custom text here
+        thanksTxt.setText(appText);
 
-        String appName = this.getString(R.string.app_name);
-        thanksTxt.setText(appName + " wouldn't be the same without these great libraries, which we \u2764");
+        //Set Icon Here
+        ImageView iv = (ImageView) findViewById(R.id.launcher);
+        iv.setBackground(getFullResDefaultActivityIcon());
     }
 
     private static final String APACHE_LISC = "Apache 2.0";
@@ -92,6 +130,40 @@ public class OssAttribActivity extends AppCompatActivity {
 
     }
 
+    private String getApplicationName(Context context) {
+        ApplicationInfo applicationInfo = context.getApplicationInfo();
+        int stringId = applicationInfo.labelRes;
+        return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString(stringId);
+    }
+
+    private Drawable getLauncherIcon(Context context) {
+        Drawable launcherIcon = null;
+
+        List<PackageInfo> pack = context.getPackageManager().getInstalledPackages(0);
+
+        for(PackageInfo p : pack){
+            launcherIcon = p.applicationInfo.loadIcon(getPackageManager());
+        }
+        return launcherIcon;
+    }
+
+    public Drawable getFullResDefaultActivityIcon() {
+        return getFullResIcon(Resources.getSystem(), android.R.mipmap.sym_def_app_icon);
+    }
+
+    public Drawable getFullResIcon(Resources resources, int iconId) {
+        Drawable d;
+        try {
+            ActivityManager activityManager = (ActivityManager) getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+            int iconDpi = activityManager.getLauncherLargeIconDensity();
+            d = resources.getDrawableForDensity(iconId, iconDpi);
+        } catch (Resources.NotFoundException e) {
+            d = null;
+        }
+
+        return (d != null) ? d : getFullResDefaultActivityIcon();
+    }
+
     private static class OssItemAdapter
             extends RecyclerView.Adapter<OssItemAdapter.ViewHolder> {
 
@@ -102,12 +174,14 @@ public class OssAttribActivity extends AppCompatActivity {
             public String mBoundString;
 
             public final View mView;
+            public final LinearLayout ossLayout;
             public final TextView libName;
             public final TextView licType;
 
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
+                ossLayout = (LinearLayout) view.findViewById(R.id.oss_item_layout);
                 libName = (TextView) view.findViewById(R.id.oss_lib_name);
                 licType = (TextView) view.findViewById(R.id.oss_license_type);
             }
@@ -136,11 +210,14 @@ public class OssAttribActivity extends AppCompatActivity {
             holder.licType.setText(mValues.get(position).licType);
 
             if (!mValues.get(position).libUrl.equals("")) {
-                // Set this lib name to bold, since it is not a header
-                holder.libName.setTypeface(null, Typeface.BOLD);
-            } else {
+                holder.ossLayout.setBackgroundColor(ContextCompat.getColor(mActivity, R.color.white));
                 holder.libName.setTypeface(null, Typeface.NORMAL);
                 holder.libName.setTypeface(null, Typeface.ITALIC);
+                holder.libName.setAllCaps(false);
+            } else {
+                holder.ossLayout.setBackgroundColor(ContextCompat.getColor(mActivity, R.color.offwhite));
+                holder.libName.setTypeface(null, Typeface.BOLD);
+                holder.libName.setAllCaps(true);
             }
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -162,24 +239,5 @@ public class OssAttribActivity extends AppCompatActivity {
             return mValues.size();
         }
     }
-
-    private class OssItem {
-        public String libName = "";
-        public String licType = "";
-        public String libUrl = "";
-
-        private OssItem(String libNameIn, String licTypeIn, String libUrlIn) {
-            libName = libNameIn;
-            licType = licTypeIn;
-            libUrl = libUrlIn;
-        }
-
-    }
-
-
-
-
-
-
 
 }

@@ -32,12 +32,10 @@
                 android:weightSum="2">
 
                 <ImageView
-                    android:id="@+id/backdrop"
-                    android:layout_width="0dp"
+                    android:id="@+id/launcher"
+                    android:layout_width="64dp"
                     android:layout_height="64dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@mipmap/ic_launcher"
-                    android:scaleType="fitCenter"
+                    android:layout_gravity="center"
                     android:layout_weight="1"/>
 
                 <TextView

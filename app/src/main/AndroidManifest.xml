@@ -15,10 +15,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.ableandroid.ossy.lib.OssAttribActivity"
-            android:label="Open Source">
-        </activity>
     </application>
 
 </manifest>
